@@ -135,22 +135,40 @@ chrome.runtime.onConnect.addListener(function(port) {
           time2 = prod_.time2 
 
           wh_info = [];
+          price_info = [];
+          client_sale = [];
           
           prod_.sizes.forEach(function (size) {
             let stockInfo = size.stocks.map(stock => {
-              return `<li>${getNameWHById(stock.wh)} - ${stock.qty} шт.</li>`;
+              if (size.origName != 0) {
+                return `<li>${size.origName} - ${getNameWHById(stock.wh)} - ${stock.qty} шт.</li>`;
+              } else {
+                return `<li>${getNameWHById(stock.wh)} - ${stock.qty} шт.</li>`;
+              }
             });
+
+            if (size.price) {              
+              let priceInfo = '';
+              price = (size.price.basic || 0) / 100;
+              client_price = (size.price.product || 0) / 100;
+              sale = 1 - client_price / price;
+              sale_end = Math.floor(sale * 100);
+
+              client_sale.push(sale_end)
+
+              if (size.origName != 0) {
+                priceInfo = `<li>${size.origName} - Цена до скидки:    ${price} ₽</li>
+                        <li>${size.origName} - Скидка:         ~ ${sale_end}%</li>
+                        <li>${size.origName} - Итоговая цена:     ${client_price} ₽</li>`;
+              } else {
+                priceInfo = `<li>Цена до скидки:    ${price} ₽</li>
+                            <li>Скидка:         ~ ${sale_end} %</li>
+                            <li>Итоговая цена:     ${client_price} ₽</li>`;
+              }              
+              price_info.push(priceInfo); 
+            }                 
             wh_info.push(stockInfo.join(" "));
-
-            price = (size.price.basic || 0) / 100;
-            client_price = (size.price.product || 0) / 100;
-
-            sale = 1 - client_price / price;
-            sale_end = Math.floor(sale * 100);
-            basic_sale = '~ ' + sale_end;            
-            client_sale = '~ ' + sale_end; 
-
-          }); 
+          });           
           
           port.postMessage({
             subj_root_name: data.subj_root_name, 
@@ -158,11 +176,9 @@ chrome.runtime.onConnect.addListener(function(port) {
             wh: w, 
             time1: time1, 
             time2: time2, 
-            price: price,
-            basic_sale: basic_sale,             
             client_sale: client_sale,
-            client_price_u: client_price,
             wh_info: wh_info,
+            price_info: price_info,
             supplier_color: supplier_color
           }) 
         })      

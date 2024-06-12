@@ -82,7 +82,9 @@ function s() {
 					lastSpan.style.fontSize = '0.9em'
 					lastSpan.style.color = '#fff'
 
-					mousElement.appendChild(newElement)						
+					// mousElement.appendChild(newElement)	
+					const firstEl = mousElement.firstElementChild	
+					firstEl.appendChild(newElement)				
 					// mousElement.insertBefore(newElement, mousElement.firstElementChild)			
 				})	
 			}			
@@ -109,10 +111,9 @@ function st(observer){
         const newD = document.createElement('ul')
         newD.className = 'wg_push'      
         newD.innerHTML = `<li>Категория: ${message.subj_name}</li>        
-                          <li>---------------------------------------------</li>                                             
-                          <li>Цена до скидки:    ${message.price} ₽</li> 
-                          <li>Скидка:         ${message.client_sale}%</li> 
-                          <li>Итоговая цена:     ${message.client_price_u} ₽</li>
+                          <li>---------------------------------------------</li>
+                          <li>Цены:</li> 
+						  ${message.price_info}  
                           <li>---------------------------------------------</li> 
                           <li>Остатки на складах:</li>   
                           ${message.wh_info}                      
